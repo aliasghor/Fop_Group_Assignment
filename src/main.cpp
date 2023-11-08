@@ -12,7 +12,7 @@ class UserInput {
             this->name = name;
         }
 
-        string show() {
+        string show() const {
             return this->name + '\n';
         }
 };
@@ -27,7 +27,7 @@ class UserInputPayment {
             this->bank_name = bank_name;
         }
 
-        string show() {
+        string show() const {
             return this->name + " " + this->bank_name + '\n';
         }
 };

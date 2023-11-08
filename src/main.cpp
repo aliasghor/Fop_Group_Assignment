@@ -113,8 +113,10 @@ int main(int argc, char const *argv[])
             }
 
             else if (choice == 2) {
+                system("cls");
                 cout << "Here's the price of the seats" << endl;
                 cout << "RM 25" << endl;
+                system("pause");
             }
 
             else if (choice == 3) {

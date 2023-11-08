@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 
 using namespace std;
 
@@ -24,7 +23,6 @@ class DataBase {
         string line;
         ofstream write;
         ifstream read;
-        vector<UserInput> user;
     public:
         DataBase(const string& filename) {
             this->filename = filename;

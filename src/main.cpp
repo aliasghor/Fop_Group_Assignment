@@ -224,6 +224,7 @@ int main(int argc, char const *argv[])
             system("cls");
             cout << "Thankyou for trying our simple project" << endl;
             delete data_base;
+            delete data_base_payment;
             return 0;
         
         default:

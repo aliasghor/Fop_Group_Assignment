@@ -34,5 +34,8 @@
         "functions": "#fffb00",
         "numbers": "#00fc09",
         "variables": "#fff700"
+    },
+    "files.associations": {
+      "iostream": "cpp"
     }
 }

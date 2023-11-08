@@ -6,45 +6,54 @@ using namespace std;
 
 class UserInput {
     private:
-        string username;
+        string name;
 
     public:
-        UserInput(const string& username) {
-            this->username = username;
+        UserInput(const string& name) {
+            this->name = name;
         }
 
-        string get_data() const {
-            return this->username + '\n';
+        string get_name() const {
+            return this->name + '\n';
         }
 };
 
 class DataBase {
     private:
         string filename;
+        string line;
         ofstream write;
         ifstream read;
         vector<UserInput> user;
-
     public:
         DataBase(const string& filename) {
             this->filename = filename;
         }
 
-        void read_data(UserInput* data) {
+        void write_file(UserInput* data) {
             this->write.open(this->filename,ios::app);
 
-            this->write << data->get_data();
+            this->write << data->get_name();
 
             this->write.close();
-
-            this->user.push_back(*data);
-            loop_user(this->user);
+            show_user_name(data);
         }
 
-        void loop_user(vector<UserInput>& array_vector) {
-            for (int i = 0; i < array_vector.size(); i++) {
-                cout << "Row: " << i + 1 << " Name: " << array_vector[i].get_data() << endl;
+        void show_user_name(UserInput* data) {
+            cout << "Data successfully stroed" << endl;
+            cout << "Here's your name that you've just made" << endl;
+            cout << data->get_name();
+        }
+
+        void view_details_of_bookings() {
+            this->read.open(this->filename);
+            int index = 1;
+
+            while (getline(this->read, this->line)) {
+                cout << "Row: " << index++ << " Name: " << this->line << endl;
             }
+
+            this->read.close();
         }
 };
 
@@ -57,36 +66,34 @@ int main(int argc, char const *argv[])
 
     while (true) {
         system("cls");
-        go_back_again:
-            cout << "Please select a user" << endl;
-            cout << "1.Book seats" << endl;
-            cout << "2.View price list" << endl;
-            cout << "3.View details of bookings" << endl;
-            cout << "4.Add details of payment" << endl;
-            cout << "5.View payment details" << endl;
-            cout << "6.Logout" << endl;
+        first_display:
+            cout << "Please selecet a user" << endl;
+            cout << "1.Administrator" << endl;
+            cout << "2.Manager" << endl;
+            cout << "3.Exit program" << endl;
             cout << '\n';
 
-        cout << "Choose your options here: ";
-        cin >> choice;
-        cin.ignore();
+            cout << "Please select your choice here: ";
+            cin >> choice;
+            cin.ignore();
 
         switch (choice)
         {
         case 1:
             system("cls");
-            cout << "Logged in as Administrator" << endl;
-            cout << "1.Book seats" << endl;
-            cout << "2.View price list" << endl;
-            cout << "3.View details of bookings" << endl;
-            cout << "4.Add details of payment" << endl;
-            cout << "5.View payment details" << endl;
-            cout << "6.Log-Out" << endl;
-            cout << '\n';
-            
-            cout << "Choose your choice here: ";
-            cin >> choice;
-            cin.ignore();
+            second_display:
+                cout << "Logged in as Administrator" << endl;
+                cout << "1.Book seats" << endl;
+                cout << "2.View price list" << endl;
+                cout << "3.View details of bookings" << endl;
+                cout << "4.Add details of payment" << endl;
+                cout << "5.View payment details" << endl;
+                cout << "6.Logout" << endl;
+                cout << '\n';
+
+                cout << "Please select your choice here: ";
+                cin >> choice;
+                cin.ignore();
 
             if (choice == 1) {
                 system("cls");
@@ -94,29 +101,51 @@ int main(int argc, char const *argv[])
                 cout << "Please fill your name to book the seats" << endl;
                 cout << '\n';
 
-                cout << "Enter your name here: ";
+                cout << "Please enter your name: ";
                 getline(cin,name);
 
                 user = new UserInput(name);
-
-                data_base->read_data(user);
+                
+                data_base->write_file(user);
                 system("pause");
 
                 delete user;
             }
 
-            if (choice == 6) {
-                goto go_back_again;
+            else if (choice == 2) {
+                cout << "Here's the price of the seats" << endl;
+                cout << "RM 25" << endl;
             }
+
+            else if (choice == 3) {
+                system("cls");
+                data_base->view_details_of_bookings();
+                system("pause");
+            }
+
+            else if (choice == 6) {
+                system("cls");
+                goto first_display;
+            }
+
+            else {
+                system("cls");
+                cout << "Error invalid option!!! please try again" << endl;
+                goto second_display; 
+            }
+
             break;
 
-
-        case 6:
-            cout << "Thankyou for trying our project" << endl;
+        case 3:
+            system("cls");
+            cout << "Thankyou for trying our simple project" << endl;
             delete data_base;
-            return 0; 
+            return 0;
         
         default:
+            system("cls");
+            cout << "Error invalid option!! please try again" << endl;
+            system("pause");
             break;
         }
     }

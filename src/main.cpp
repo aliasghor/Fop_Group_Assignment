@@ -1,94 +1,73 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
 class UserInput {
     private:
         string username;
-        string password;
 
     public:
-        UserInput(const string& username, const string& password) {
+        UserInput(const string& username) {
             this->username = username;
-            this->password = password;
         }
 
         string get_data() const {
-            return this->username + " " + this->password + "\n";
-        }
-
-        string show_data() const {
-            return this->username + "\t\t" + " " + this->password;
+            return this->username + '\n';
         }
 };
 
-class Database {
+class DataBase {
     private:
         string filename;
         ofstream write;
         ifstream read;
-        string line;
-        string file_username;
-        string file_password;
+        vector<UserInput> user;
 
     public:
-        Database(const string& filename) {
+        DataBase(const string& filename) {
             this->filename = filename;
         }
 
-        void read_file(UserInput* data) {
+        void read_data(UserInput* data) {
             this->write.open(this->filename,ios::app);
 
             this->write << data->get_data();
 
             this->write.close();
+
+            this->user.push_back(*data);
+            loop_user(this->user);
         }
 
-        void show(UserInput* data) {
-            cout << "Account successfully created" << endl;
-            cout << "Here's your username and password" << endl;
-            cout << '\n';
-
-            cout << "Username\t " << " Password" << endl;
-            cout << data->show_data() << endl;
-        }
-
-        bool user_exist(const string& username, const string& password) {
-            this->read.open(this->filename);
-
-            while (getline(this->read,this->line)) {
-                this->file_username = this->line.substr(0,this->line.find(' '));
-                this->file_password = this->line.substr(this->line.find(' ') + 1);
-
-                if (this->file_username == username && this->file_password == password) {
-                    this->read.close();
-                    return true;
-                }
+        void loop_user(vector<UserInput>& array_vector) {
+            for (int i = 0; i < array_vector.size(); i++) {
+                cout << "Row: " << i + 1 << " Name: " << array_vector[i].get_data() << endl;
             }
-            this->read.close();
-            return false;
         }
 };
 
 int main(int argc, char const *argv[])
 {
+    DataBase* data_base = new DataBase(".\\bin\\data.txt");
     UserInput* user;
-    Database* data_base = new Database(".\\bin\\data.txt");
-    string username, passsword;
+    string name;
     int choice;
 
-    while (true)
-    {
+    while (true) {
         system("cls");
-        cout << "Please selecet a user" << endl;
-        cout << "1.Administrator" << endl;
-        cout << "2.Sign-Up As Administrator" << endl;
-        cout << "3.Manager" << endl;
-        cout << "4.Exit-Program" << endl;
-        cout << '\n';
+        go_back_again:
+            cout << "Please select a user" << endl;
+            cout << "1.Book seats" << endl;
+            cout << "2.View price list" << endl;
+            cout << "3.View details of bookings" << endl;
+            cout << "4.Add details of payment" << endl;
+            cout << "5.View payment details" << endl;
+            cout << "6.Logout" << endl;
+            cout << '\n';
 
-        cout << "Please enter your choice here: ";
+        cout << "Choose your options here: ";
         cin >> choice;
         cin.ignore();
 
@@ -96,59 +75,50 @@ int main(int argc, char const *argv[])
         {
         case 1:
             system("cls");
-            cout << "Great you want to logged in as administrator" << endl;
-            cout << "Please fill this username and password that you've just made earlier" << endl;
+            cout << "Logged in as Administrator" << endl;
+            cout << "1.Book seats" << endl;
+            cout << "2.View price list" << endl;
+            cout << "3.View details of bookings" << endl;
+            cout << "4.Add details of payment" << endl;
+            cout << "5.View payment details" << endl;
+            cout << "6.Log-Out" << endl;
             cout << '\n';
-
-            cout << "Please enter your username: ";
-            getline(cin,username);
-
-            cout << "Please enter your passowrd: ";
-            getline(cin,passsword);
-
-            if (data_base->user_exist(username,passsword)) {
-                cout << "Succesfully logged in " << username <<endl;
-                system("pause");
-            }
-            else {
-                cout << "Error invalid username or password" << endl;
-                system("pause");
-            }
-
-            break;
-
-        case 2:
-            system("cls");
-            cout << "Great you want to sign up as administrator" << endl;
-            cout << "Please fill this username and password" << endl;
-            cout << '\n';
-
-            cout << "Please enter your username: ";
-            getline(cin,username);
-
-            cout << "Please enter your password: ";
-            getline(cin,passsword);
             
+            cout << "Choose your choice here: ";
+            cin >> choice;
+            cin.ignore();
 
-            user = new UserInput(username,passsword);
+            if (choice == 1) {
+                system("cls");
+                cout << "Great you want to book a seats" << endl;
+                cout << "Please fill your name to book the seats" << endl;
+                cout << '\n';
 
-            data_base->read_file(user);
-            data_base->show(user);
-            system("pause");
-            delete user;
+                cout << "Enter your name here: ";
+                getline(cin,name);
 
+                user = new UserInput(name);
+
+                data_base->read_data(user);
+                system("pause");
+
+                delete user;
+            }
+
+            if (choice == 6) {
+                goto go_back_again;
+            }
             break;
 
-        case 4:
-            system("cls");
-            cout << "Thankyou for trying our simple database project" << endl;
+
+        case 6:
+            cout << "Thankyou for trying our project" << endl;
             delete data_base;
-            return 0;
+            return 0; 
         
         default:
-            cout << "Error invalid option please try again!!" << endl;
             break;
-        } 
+        }
     }
 
     cin.get();

@@ -36,6 +36,7 @@
         "variables": "#fff700"
     },
     "files.associations": {
-      "iostream": "cpp"
+      "iostream": "cpp",
+      "new": "cpp"
     }
 }

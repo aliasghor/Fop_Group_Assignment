@@ -170,7 +170,7 @@ int main(int argc, char const *argv[])
         case 1:
             system("cls");
 
-                cout << "Logged in as Administrator" << endl;
+            cout << "Logged in as Administrator" << endl;
                 second_display:
                 cout << "1.Book Seats" << endl;
                 cout << "2.View price list" << endl;
@@ -268,6 +268,7 @@ int main(int argc, char const *argv[])
             system("cls");
             cout << "Thanks for trying our project" << endl;
             delete data_base;
+            delete view_payment_data_base;
             return 0;
         
         default:

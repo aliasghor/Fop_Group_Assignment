@@ -62,13 +62,8 @@ class DataBase {
         virtual void read_file() {
             this->read.open(this->filename);
             int index = 1;
-            
-            this->read.peek();
-            if (this->read.eof()) {
-                cout << "Seats are still empty please book your seats first!!" << endl;
-            }
 
-            else if (!this->read.is_open()) {
+            if (!this->read.is_open()) {
                 cout << "Seats are still empty please book your seats first!!" << endl;
             }
 
@@ -116,14 +111,9 @@ class ViewPayment : public DataBase {
             this->read.open(this->filename);
             int index = 1;
 
-            this->read.peek();
-
-            if (this->read.eof()) {
+            if (!this->read.is_open()) {
                 cout << "There aren't any names nor bank's name" << endl;
-            }
-
-            else if (!this->read.is_open()) {
-                cout << "There aren't any names nor bank's name" << endl;
+                cout << "Please create your name and your bank name first!!" << endl;
             }
 
             else {
@@ -157,7 +147,7 @@ int main(int argc, char const *argv[])
         first_display:
             cout << "Please select a user" << endl;
             cout << "1.Administrator" << endl;
-            cout << "2.Manage" << endl;
+            cout << "2.Manager" << endl;
             cout << "3.Exit-Program" << endl;
             cout << '\n';
 
@@ -262,6 +252,24 @@ int main(int argc, char const *argv[])
                 goto second_display;
             }
 
+            break;
+
+        case 2:
+            system("cls");
+            cout << "Logged in as Manager" << endl;
+            cout << "1.View overall payments collected" << endl;
+            cout << "2.View seats sold/available" << endl;
+            cout << "3.logout" << endl;
+            cout << '\n';
+
+            cout << "Choose your option here: ";
+            cin >> choice;
+            cin.ignore();
+
+            if (choice == 3) {
+                system("cls");
+                goto first_display;
+            }
             break;
 
         case 3:

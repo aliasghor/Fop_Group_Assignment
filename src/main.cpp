@@ -67,6 +67,11 @@ class DataBase {
             if (this->read.eof()) {
                 cout << "Seats are still empty please book your seats first!!" << endl;
             }
+
+            else if (!this->read.is_open()) {
+                cout << "Seats are still empty please book your seats first!!" << endl;
+            }
+
             else {
                 respond();
                 while (getline(this->read, this->line)) {
@@ -76,19 +81,63 @@ class DataBase {
             this->read.close();
         }
 
-        void respond() const {
-            cout << "Here's our users rows and name's that is already booked the tickets" << endl;
+        virtual void respond() const {
+            cout << "Here's your users rows and name's that is already booked the tickets" << endl;
         }
 
         friend class ViewPayment;
 };
 
 class ViewPayment : public DataBase {
+    private:
+        string m_bank_name;
+        User* data;
+
     public:
-        ViewPayment(const string& name) : DataBase(name) {}
+        ViewPayment(const string& filename) : DataBase(filename) {}
+
+        void write_file_to_different_file(ViewPayment* data_payment) {
+            this->write.open(this->filename,ios::app);
+
+            this->write << data->get_name() << data_payment->m_bank_name << endl;
+
+            this->write.close();
+
+            show_name_and_bank_account(data_payment);
+        }
+
+        void show_name_and_bank_account(ViewPayment* show_data) {
+            cout << "Name and Bank's account succesfully created" << endl;
+            cout << "Here's your name and your bank account name's" << endl;
+            cout << data->get_name() << show_data->m_bank_name << endl;
+        }
 
         void read_file() override {
-            
+            this->read.open(this->filename);
+            int index = 1;
+
+            this->read.peek();
+
+            if (this->read.eof()) {
+                cout << "There aren't any names nor bank's name" << endl;
+            }
+
+            else if (!this->read.is_open()) {
+                cout << "There aren't any names nor bank's name" << endl;
+            }
+
+            else {
+                respond();
+                while (getline(this->read, this->line)) {
+                    cout << index++  << ". " << this->line << endl;
+                }
+            }
+
+            this->read.close();
+        }
+
+        void respond() const override {
+            cout << "Here's your name and your bank's name" << endl;
         }
 };
 
@@ -148,9 +197,11 @@ int main(int argc, char const *argv[])
 
                 data_base->write_file(user_input);
                 system("pause");
-                system("cls");
 
                 delete user_input;
+
+                system("cls");
+
                 goto second_display;
             }
 
@@ -184,7 +235,20 @@ int main(int argc, char const *argv[])
 
                 payment_user = new PaymentUser(name,bank_name);
 
+                view_payment_data_base->write_file(payment_user);
+                system("pause");
+
                 delete payment_user;
+
+                system("cls");
+            }
+
+            else if (choice == 5) {
+                system("cls");
+                view_payment_data_base->read_file();
+                system("pause");
+                system("cls");
+                goto second_display;
             }
 
             else if (choice == 6) {

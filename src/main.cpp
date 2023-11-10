@@ -171,7 +171,7 @@ int main(int argc, char const *argv[])
             system("cls");
 
             cout << "Logged in as Administrator" << endl;
-                second_display:
+            second_display:
                 cout << "1.Book Seats" << endl;
                 cout << "2.View price list" << endl;
                 cout << "3.View details of bookings" << endl;

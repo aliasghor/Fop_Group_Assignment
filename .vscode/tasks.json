@@ -15,7 +15,7 @@
             ]
         },
         {
-            "label":"run",
+            "label": "run",
             "type": "shell",
             "command":".\\bin\\a",
             "dependsOn":["Compile C++"],

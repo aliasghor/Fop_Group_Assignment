@@ -16,10 +16,10 @@ class UserSeats {
 
 class UserPayments : public UserSeats {
     protected:
-        int m_banks_name;
+        string m_banks_name;
 
     public:
-        UserPayments(const string& name, const int& row, const int& banks_name) : UserSeats(name, row), m_banks_name(banks_name) {}
+        UserPayments(const string& name, const int& row, const string& banks_name) : UserSeats(name, row), m_banks_name(banks_name) {}
 
         friend class DatabasePayments;
 };
@@ -56,9 +56,9 @@ class DatabaseSeats {
         bool check_name(const string& name) {
             this->read.open(m_filename);
             string temp_name;
-            int temp_age;
+            int temp_row;
 
-            while (this->read >> temp_name >> temp_age)
+            while (this->read >> temp_name >> temp_row)
             {
                 if (temp_name == name) {
                     this->read.close();
@@ -91,13 +91,33 @@ class DatabasePayments : public DatabaseSeats {
         DatabasePayments(const string& filename) : DatabaseSeats(filename) {}
 
         void write_file_payments(UserPayments* user_payment) {
-            this->write.open(m_filename,ios::app);
+            if (!check_name(user_payment->m_name) && !check_row_seats(user_payment->m_row) && !check_row_seats(user_payment->m_row)) {
+                this->write.open(m_filename,ios::app);
 
-            this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_banks_name << endl;
+                this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_banks_name << endl;
 
-            this->write.close();
+                this->write.close();
+            }
         }
-        
+
+        // void show_seats_and_banks_nam
+
+        bool check_bank_name(const string& banks_name) {
+            read.open(m_filename);
+            string temp_name;
+            int temp_row;
+            string temp_banks_name;
+
+            while (read >> temp_name >> temp_row >> temp_banks_name)
+            {
+                if (temp_banks_name == banks_name) {
+                    read.close();
+                    return true;
+                }
+            }
+            read.close();
+            return false;
+        }
 };
 
 int main(int argc, char const *argv[])
@@ -109,7 +129,7 @@ int main(int argc, char const *argv[])
     UserPayments* user_payments;
 
     string name, banks_name;
-    int choice, seats, banks_number;
+    int choice, seats;
 
     while (true)
     {
@@ -150,7 +170,7 @@ int main(int argc, char const *argv[])
                 cout << "Please fill your name and your row seats" << endl;
                 cout << '\n';
 
-                name:
+                name1:
                     cout << "Please enter your name: ";
                     getline(cin,name);
 
@@ -158,10 +178,10 @@ int main(int argc, char const *argv[])
                     system("cls");
                     cout << "Error that name is already in the database!!!" << endl;
                     cout << "Please pick another name" << endl;
-                    goto name;
+                    goto name1;
                 }
 
-                seats:
+                seats1:
                     cout << "Please enter your row seats: ";
                     cin >> seats;
 
@@ -169,7 +189,7 @@ int main(int argc, char const *argv[])
                     system("cls");
                     cout << "Error that seats row is already in the database!!!" << endl;
                     cout << "Please pick another seats row" << endl;
-                    goto seats;
+                    goto seats1;
                 }
 
                 user_seats = new UserSeats(name,seats);
@@ -204,15 +224,38 @@ int main(int argc, char const *argv[])
                 cout << "2.Maybank" << endl;
                 cout << "3.CIMB" << endl;
                 cout << '\n';
+                
+                name2:
+                    cout << "Please enter your previous name: ";    
+                    getline(cin,name);
+                
+                if (data_base_payments->check_name(name)) {
+                    system("cls");
+                    cout << "Error that name is already in the database!!" << endl;
+                    cout << "Please try again" << endl;
+                    goto name2;
+                }
 
-                cout << "Please enter your previous name: ";
-                getline(cin,name);
-                cout << "Please enter your previous seats row: ";
-                cin >> seats;
+                seats2:
+                    cout << "Please enter your previous seats row: ";
+                    cin >> seats;
+
+                if (data_base_payments->check_row_seats(seats)) {
+                    cout << "Error that seats row is already in the database!!" << endl;
+                    cout << "Please try again" << endl;
+                    goto seats2;
+                }
+
                 cout << "Please choose the banks number: ";
-                cin >> banks_number;
+                getline(cin,banks_name);
 
-                user_payments = new UserPayments(name, seats, banks_number);
+                if (data_base_payments->check_bank_name(name)) {
+                    cout << "Error that banks name is already in the database!!" << endl;
+                }
+
+                user_payments = new UserPayments(name, seats, banks_name);
+
+                data_base_payments->write_file_payments(user_payments);
 
                 delete user_payments;
             }

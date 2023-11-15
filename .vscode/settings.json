@@ -2,7 +2,7 @@
     "editor.wordWrap": "on",
     "editor.fontSize": 16,  
     "window.zoomLevel": -1,
-    "workbench.colorTheme": "Dobri Next -A00- Black",
+    "workbench.colorTheme": "AquaUnstoppable Theme",
     "terminal.integrated.fontSize": 16,
     "workbench.iconTheme": "vscode-icons",
     "workbench.colorCustomizations": {
@@ -10,29 +10,29 @@
       "activityBarBadge.background": "#a319af",
       "activityBarBadge.foreground": "#0f0f0f",
       // Border separating the title bar from the rest of the editor
-      "titleBar.border": "#ff00ea",
+      "titleBar.border": "#006aff",
       // Border color to separate Tabs from each other
       "tab.border": "#000000",
       // Border color on the top separating to the editor (terminal)
-      "panel.border": "#ff00ea",
+      "panel.border": "#006aff",
       // Border color on the side separating the editor
-      "sideBar.border": "#ff00ea",
+      "sideBar.border": "#006aff",
       // Border color with the Side Bar
-      "activityBar.border": "#ff00ea",
+      "activityBar.border": "#006aff",
       // Border color separating the Status Bar and editor
-      "statusBar.border": "#ff00ea",
+      "statusBar.border": "#006aff",
       // Border color to separate multiple editor groups from each other
-      "editorGroup.border": "#ff00ea",
+      "editorGroup.border": "#006aff",
       // Border color of the editor group title header when tabs are enabled
       "editorGroupHeader.tabsBorder": "#18222D",
     },
     "editor.tokenColorCustomizations": {
         "comments": "#ffea00",
-        "keywords": "#00fff2",
+        "keywords": "#006aff",
         "strings": "#ff00ea",
-        "types": "#00ff22",
+        "types": "#00fbff",
         "functions": "#fffb00",
-        "numbers": "#00fc09",
+        "numbers": "#c500fc",
         "variables": "#fff700"
     },
     "files.associations": {

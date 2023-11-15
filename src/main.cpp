@@ -97,10 +97,17 @@ class DatabasePayments : public DatabaseSeats {
                 this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_banks_name << endl;
 
                 this->write.close();
+
+                show_seats_and_banks_name(user_payment);
             }
         }
 
-        // void show_seats_and_banks_nam
+        void show_seats_and_banks_name(UserPayments* show) {
+            cout << "Account successfully created" << endl;
+            cout << "Here's your name, seats row and your Bank's name" << endl;
+            cout << "Name " << " Seats row " << " Bank's name" << endl;
+            cout << show->m_name << " " <<show->m_row << " " <<show->m_banks_name << endl;
+        }
 
         bool check_bank_name(const string& banks_name) {
             read.open(m_filename);
@@ -239,6 +246,7 @@ int main(int argc, char const *argv[])
                 seats2:
                     cout << "Please enter your previous seats row: ";
                     cin >> seats;
+                    cin.ignore();
 
                 if (data_base_payments->check_row_seats(seats)) {
                     cout << "Error that seats row is already in the database!!" << endl;
@@ -256,6 +264,7 @@ int main(int argc, char const *argv[])
                 user_payments = new UserPayments(name, seats, banks_name);
 
                 data_base_payments->write_file_payments(user_payments);
+                system("pause");
 
                 delete user_payments;
             }

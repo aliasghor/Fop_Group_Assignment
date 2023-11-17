@@ -139,7 +139,7 @@ class DatabasePayments : public DatabaseSeats {
 
             this->write.close();
 
-            show_name_and_row(user_payment);
+            show_name_and_seats_row_and_banks_name(user_payment);
         }
 
         inline void show_name_and_seats_row_and_banks_name(UserPayments* user_payment_data) const {
@@ -147,8 +147,8 @@ class DatabasePayments : public DatabaseSeats {
             cout << "Here's your name, seats row and your banks name" << endl;
             cout << '\n';
 
-            cout << "Name " << " Seats Row" << " Banks Name" << endl;
-            cout << user_payment_data->m_name << " " << user_payment_data->m_row << " " << user_payment_data->m_banks_name << endl;
+            cout << "Name\t " << "   Seats Row\t " << "   Banks Name" << endl;
+            cout << user_payment_data->m_name << "\t\t" << user_payment_data->m_row << "\t\t" << user_payment_data->m_banks_name << endl;
         }
 
         bool check_previous_name(const string& name) {
@@ -165,17 +165,6 @@ class DatabasePayments : public DatabaseSeats {
 
             this->read.close();
             return false;
-        }
-
-        inline bool check_empty_banks_name() {
-            this->read.open(m_filename);
-
-            if (!this->read.is_open()) {
-                return false;
-            }
-
-            this->read.close();
-            return true;
         }
 };
 
@@ -319,13 +308,15 @@ int main(int argc, char const *argv[])
                 }
 
                 else if (!data_base_seats->check_empty_name()) {
+                    system("cls");
                     cerr << "Error you haven't registered your names yet!!" << endl;
                     cerr << "You must register your names first!!" << endl;
                     system("pause");
                     goto second_display;
                 }
                 
-                else if (data_base_payments->check_previous_name(name)) {
+                else if (!data_base_seats->check_name(name)) {
+                    system("cls");
                     cerr << "Error that name is not in the database!!!" << endl;
                     cerr << "Please input your previous name!!" << endl;
                     goto try_name2;
@@ -334,6 +325,7 @@ int main(int argc, char const *argv[])
                 try_seats2:
                     cout << "Please enter your previous seats row(1-30): ";
                     cin >> seats_row;
+                    cin.ignore();
 
                 if (seats_row < 0 || seats_row > 30) {
                     system("cls");
@@ -342,7 +334,8 @@ int main(int argc, char const *argv[])
                     goto try_seats2;
                 }
 
-                else if (data_base_seats->check_seats_row(seats_row)) {
+                else if (!data_base_seats->check_seats_row(seats_row)) {
+                    system("cls");
                     cerr << "Error that seats row is not in the database!!!" << endl;
                     cerr << "Please input your previous seats row!!" << endl;
                     goto try_seats2;
@@ -359,14 +352,21 @@ int main(int argc, char const *argv[])
                     goto try_banks_name;
                 }
 
-                else {
-                    user_payments = new UserPayments(name, seats_row, banks_name);
-
-                    data_base_payments->write_file_payments(user_payments);
-                    system("pause");
-
-                    delete user_payments;
+                else if (banks_name != "RHB" && banks_name != "Maybank" && banks_name != "CIMB") {
+                    system("cls");
+                    cerr << "Error invalid bank's name!!" << endl;
+                    cerr << "Please try again" << endl;
+                    goto try_banks_name;
                 }
+
+                user_payments = new UserPayments(name, seats_row, banks_name);
+
+                data_base_payments->write_file_payments(user_payments);
+                system("pause");
+
+                delete user_payments;
+
+                goto second_display;
             }
 
             else if (choice == 5) {
@@ -387,6 +387,48 @@ int main(int argc, char const *argv[])
                 cerr << "Please try again!!" << endl;
                 system("pause");
                 goto second_display;
+            }
+            break;
+
+        case 2:
+            system("cls");
+            third_display:
+                system("cls");
+                cout << "Logged in as manager" << endl;
+                cout << "1.View overall payments collected" << endl;
+                cout << "2.View seats sold available" << endl;
+                cout << "3.Logout" << endl;
+                cout << '\n';
+
+                cout << "Choose your options here: ";
+                cin >> choice;
+
+            if (choice == 2) {
+                if (!data_base_seats->check_empty_view_details_bookings()) {
+                    system("cls");
+                    cerr << "Error you haven't created the name and your seats row!!" << endl;
+                    cerr << "Please fill your name and your seats row first!!" << endl;
+                    system("pause");
+                    goto second_display;
+                }
+
+                else {
+                    system("cls");
+                    data_base_seats->view_details_bookings();
+                    system("pause");  
+                }
+            }
+
+            else if (choice == 3) {
+                goto first_display;
+            }
+
+            else {
+                system("cls");
+                cout << "Error invalid option!!!" << endl;
+                cout << "Please try again" << endl;
+                system("pause");
+                goto third_display;
             }
             break;
 

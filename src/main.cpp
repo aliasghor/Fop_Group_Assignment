@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 class UserSeats {
     protected:
         string m_name;
@@ -24,6 +25,7 @@ class UserPayments : public UserSeats {
         friend class DatabasePayments;
 };
 
+
 class DatabaseSeats {
     protected:
         string m_filename;
@@ -34,32 +36,59 @@ class DatabaseSeats {
         DatabaseSeats(const string& filename) : m_filename(filename) {}
 
         void write_file_seats(UserSeats* user_seats_data) {
-            this->write.open(m_filename,ios::app);
+            if (!check_name(user_seats_data->m_name) && !check_seats_row(user_seats_data->m_row)) {
+                this->write.open(m_filename,ios::app);
 
-            if (!check_name(user_seats_data->m_name) && !check_row_seats(user_seats_data->m_row)) {
                 this->write << user_seats_data->m_name << " " << user_seats_data->m_row << endl;
+
+                this->write.close();
+
+                show_name_and_row(user_seats_data);
             }
-            this->write.close();
-            show_seats_and_name(user_seats_data);
         }
 
-        void show_seats_and_name(UserSeats* user_seats_data) const {
-            cout << "Account and Seats Row sucessfully created" << endl;
-            cout << "Here's your name and your seats row that you've just made" << endl;
+        void show_name_and_row(UserSeats* user_seats) {
+            cout << "Account successfully created" << endl;
+            cout << "Here's your name and your seats row" << endl;
             cout << '\n';
 
-            cout << "Name\t " << " Seats" << endl;
-            cout << user_seats_data->m_name << "\t" << "    " <<  user_seats_data->m_row << endl;
+            cout << "Name\t " << "     Seats Row" << endl;
+            cout << user_seats->m_name << "\t\t" << user_seats->m_row << endl;
+        }
+
+        void view_details_bookings() {
+            this->read.open(m_filename);
+
+            if (!this->read.is_open()) {
+                cerr << "Error you must create your name and your seats row first choosed this option!!!" << endl;
+                return;
+            }
+
+            this->read.close();
+
+            this->read.open(m_filename);
+            string temp_name;
+            int temp_seats;
+            int index = 1;
+
+            cout << "Row " << " Name " << "   Seats Row" << endl;
+            while (this->read >> temp_name >> temp_seats)
+            {
+                cout << index++ << ". " << "  " << temp_name << "\t" << temp_seats << endl;
+            }
+            
+            this->read.close();
         }
 
         bool check_name(const string& name) {
             this->read.open(m_filename);
             string temp_name;
-            int temp_row;
+            int temp_seats;
 
-            while (this->read >> temp_name >> temp_row)
+            while (this->read >> temp_name >> temp_seats)
             {
-                if (temp_name == name) {
+                if (temp_name == name) 
+                {
                     this->read.close();
                     return true;
                 }
@@ -68,14 +97,15 @@ class DatabaseSeats {
             return false;
         }
 
-        bool check_row_seats(const int& row) {
+        bool check_seats_row(const int& seats_row) {
             this->read.open(m_filename);
             string temp_name;
-            int temp_row;
+            int temp_seats;
 
-            while (this->read >> temp_name >> temp_row)
+            while (this->read >> temp_name >> temp_seats)
             {
-                if (temp_row == row) {
+                if (temp_seats == seats_row)
+                {
                     this->read.close();
                     return true;
                 }
@@ -90,89 +120,41 @@ class DatabasePayments : public DatabaseSeats {
         DatabasePayments(const string& filename) : DatabaseSeats(filename) {}
 
         void write_file_payments(UserPayments* user_payment) {
-            this->write.open(m_filename,ios::app);
+            this->write.open(m_filename);
 
-            if (!check_name(user_payment->m_name) && !check_row_seats(user_payment->m_row) && !check_row_seats(user_payment->m_row)) {
-                this->write.open(m_filename,ios::app);
+            this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_banks_name << endl;
 
-                this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_banks_name << endl;
-
-            }
             this->write.close();
 
-            show_seats_and_banks_name(user_payment);
+            show_name_and_row(user_payment);
         }
 
-        void show_seats_and_banks_name(UserPayments* show) {
+        void show_name_and_seats_row_and_banks_name(UserPayments* user_payment_data) {
             cout << "Account successfully created" << endl;
-            cout << "Here's your name, seats row and your Bank's name" << endl;
-            cout << "Name " << " Seats row " << " Bank's name" << endl;
-            cout << show->m_name << " " << show->m_row << " " << show->m_banks_name << endl;
-        }
+            cout << "Here's your name, seats row and your banks name" << endl;
+            cout << '\n';
 
-        void view_payment_details() {
-            this->read.open(m_filename);
-
-            if (!this->read.is_open()) {
-                cerr << "Error the file hasn't been created yet!!" << endl;
-                cout << "Please create the file first" << endl;
-                return;
-            }
-
-            this->read.close();
-
-            this->read.open(m_filename);
-
-            string line;
-            int index = 1;
-
-            while (getline(this->read, line))
-            {
-                cout << index++ << ". " << line << endl;
-            }
-
-            this->read.close();
-        }
-
-        bool file_exists(const string& filename) {
-            this->read.open(m_filename);
-
-            return this->read.good();
-        }
-
-        bool check_bank_name(const string& banks_name) {
-            read.open(m_filename);
-            string temp_name;
-            int temp_row;
-            string temp_banks_name;
-
-            while (read >> temp_name >> temp_row >> temp_banks_name)
-            {
-                if (temp_banks_name == banks_name) {
-                    read.close();
-                    return true;
-                }
-            }
-            read.close();
-            return false;
+            cout << "Name " << " Seats Row" << " Banks Name" << endl;
+            cout << user_payment_data->m_name << " " << user_payment_data->m_row << " " << user_payment_data->m_banks_name << endl;
         }
 };
+
 
 int main(int argc, char const *argv[])
 {
     DatabaseSeats* data_base_seats = new DatabaseSeats(".\\bin\\seats.txt");
     DatabasePayments* data_base_payments = new DatabasePayments(".\\bin\\payments.txt");
 
-    UserSeats* user_seats;
     UserPayments* user_payments;
+    UserSeats* user_seats;
 
     string name, banks_name;
-    int choice, seats;
-
+    int choice, seats_row;
+    
     while (true)
     {
-        system("cls");
         first_display:
+            system("cls");
             cout << "Please select a user" << endl;
             cout << "1.Administrator" << endl;
             cout << "2.Manager" << endl;
@@ -186,16 +168,15 @@ int main(int argc, char const *argv[])
         switch (choice)
         {
         case 1:
-            system("cls");
-            cout << "Logged in as Administrator" << endl;
             second_display:
                 system("cls");
-                cout << "1.Book Seats" << endl;
-                cout << "2.View Price List" << endl;
-                cout << "3.View Details Of Payment" << endl;
-                cout << "4.Add Details Of Payment" << endl;
-                cout << "5.View Payment Details" << endl;
-                cout << "6.Logout" << endl;
+                cout << "Logged in as: Administrator" << endl;
+                cout << "1. Book seats" << endl;
+                cout << "2. View price list"  << endl;
+                cout << "3. View details bookings" << endl;
+                cout << "4. Add details payment" << endl;
+                cout << "5. View payment detail" << endl;
+                cout << "6. Logout" << endl;
                 cout << '\n';
 
                 cout << "Choose your options here: ";
@@ -208,116 +189,117 @@ int main(int argc, char const *argv[])
                 cout << "Please fill your name and your row seats" << endl;
                 cout << '\n';
 
-                name1:
+                try_name1:
                     cout << "Please enter your name: ";
                     getline(cin,name);
 
                 if (name.empty()) {
                     system("cls");
-                    cerr << "Error you cannot just skipped the name!!" << endl;
-                    goto name1;
+                    cerr << "Error you cannot just skipped the name!!!" << endl;
+                    cerr << "Please input your name!!" << endl;
+                    goto try_name1;
                 }
 
-                if (data_base_seats->check_name(name)) {
+                else if (data_base_seats->check_name(name)) {
                     system("cls");
-                    cout << "Error that name is already in the database!!!" << endl;
-                    cout << "Please pick another name" << endl;
-                    goto name1;
+                    cerr << "Error that name is already in the database!!!" << endl;
+                    cerr << "Please pick another name!!" << endl;
+                    goto try_name1;
                 }
 
-                seats1:
-                    cout << "Please enter your row seats (1-30): ";
-                    cin >> seats;
-                    cin.ignore();
+                try_seats1:
+                    cout << "Please enter your seats row (1-30) ";
+                    cin >> seats_row;
 
-                if (seats < 1 || seats > 30) {
+                if (seats_row < 1 || seats_row > 30) {
                     system("cls");
-                    cerr << "Error invalid user seats option!!!" << endl;
-                    cout << "You must choose the seats number from 1-30" << endl;
-                    goto seats1;
+                    cerr << "Error invalid seats row!!!" << endl;
+                    cerr << "Please choose a seats row from (1-30)!!" << endl;
+                    goto try_seats1;
                 }
 
-                else if (data_base_seats->check_row_seats(seats)) {
+                else if (data_base_seats->check_seats_row(seats_row)) {
                     system("cls");
-                    cout << "Error that seats row is already in the database!!!" << endl;
-                    cout << "Please pick another seats row" << endl;
-                    goto seats1;
+                    cerr << "Error that seats row is already in the database!!!" << endl;
+                    cerr << "Please pick another seats row!!" << endl;
+                    goto try_seats1;
                 }
 
-                user_seats = new UserSeats(name,seats);
+                user_seats = new UserSeats(name, seats_row);
 
                 data_base_seats->write_file_seats(user_seats);
                 system("pause");
 
-                goto second_display;
-
                 delete user_seats;
-            }
 
+                goto second_display;
+            }
 
             else if (choice == 3) {
                 system("cls");
-                cout << "Here's the details of the payment that you can use" << endl;
-                cout << "1.RHB" << endl;
-                cout << "2.Maybank" << endl;
-                cout << "3.CIMB" << endl;
+                cout << "Here's the users that already booked" << endl;
+                data_base_seats->view_details_bookings();
                 system("pause");
                 goto second_display;
             }
 
             else if (choice == 4) {
                 system("cls");
-                cout << "Great you want to add details of your payment" << endl;
-                cout << "Please fill your previous name and seats row and your bank's name that you want to create" << endl;
+                cout << "Great you want to add your payment details" << endl;
+                cout << "Please fill your previous seats row, name and your bank's name" << endl;
                 cout << '\n';
 
-                cout << "Available Bank's name" << endl;
+                cout << "Here's our banks name that are available.please choose one these of the names" << endl;
                 cout << "- RHB" << endl;
                 cout << "- Maybank" << endl;
                 cout << "- CIMB" << endl;
                 cout << '\n';
-                
-                name2:
-                    cout << "Please enter your previous name: ";    
+
+                try_name2:
+                    cout << "Please enter your previous name: ";
                     getline(cin,name);
 
                 if (name.empty()) {
-                    cerr << "Error you cannot just skipped the name!!" << endl;
-                    goto name2;
-                }
-                
-                else if (data_base_payments->check_name(name)) {
                     system("cls");
-                    cout << "Error that name is already in the database!!" << endl;
-                    cout << "Please try again" << endl;
-                    goto name2;
+                    cerr << "Error you cannot just skipped the name!!" << endl;
+                    cerr << "Please try again" << endl;
+                    goto try_name2;
                 }
 
-                seats2:
-                    cout << "Please enter your previous seats row: ";
-                    cin >> seats;
-                    cin.ignore();
-
-                if (seats < 1 || seats > 30) {
-                    cerr << "Error invalid seats option!!!" << endl;
-                    cout << "Please try again" << endl;
-                    goto seats2;
+                else if (data_base_seats->check_name(name)) {
+                    cerr << "Error that name is not in the database!!!" << endl;
+                    cerr << "Please input your previous name!!" << endl;
+                    goto try_name2;
                 }
 
-                if (data_base_payments->check_row_seats(seats)) {
-                    cout << "Error that seats row is already in the database!!" << endl;
-                    cout << "Please try again" << endl;
-                    goto seats2;
+                try_seats2:
+                    cout << "Please enter your previous seats row(1-30): ";
+                    cin >> seats_row;
+
+                if (seats_row < 0 || seats_row > 30) {
+                    system("cls");
+                    cerr << "Error invalid seats row!!" << endl;
+                    cerr << "Please try again" << endl;
+                    goto try_seats2;
                 }
 
-                cout << "Please choose your payment bank's name: ";
-                getline(cin,banks_name);
-
-                if (data_base_payments->check_bank_name(name)) {
-                    cout << "Error that banks name is already in the database!!" << endl;
+                else if (data_base_seats->check_seats_row(seats_row)) {
+                    cerr << "Error that seats row is not in the database!!!" << endl;
+                    cerr << "Please input your previous seats row!!" << endl;
+                    goto try_seats2;
                 }
 
-                user_payments = new UserPayments(name, seats, banks_name);
+                try_banks_name:
+                    cout << "Please enter your bank's name: "; 
+                    getline(cin,banks_name);
+
+                if (banks_name.empty()) {
+                    cerr << "Error you cannot just skipped the banks name!!" << endl;
+                    cerr << "Please try again" << endl;
+                    goto try_banks_name;
+                }
+
+                user_payments = new UserPayments(name, seats_row, banks_name);
 
                 data_base_payments->write_file_payments(user_payments);
                 system("pause");
@@ -325,22 +307,14 @@ int main(int argc, char const *argv[])
                 delete user_payments;
             }
 
-            else if (choice == 5) {
-                system("cls");
-                data_base_payments->view_payment_details();
-                system("pause");
-                goto second_display;
-            }
-
             else if (choice == 6) {
-                system("cls");
                 goto first_display;
             }
 
             else {
                 system("cls");
-                cout << "Error invalid option!!!" << endl;
-                cout << "Please try again" << endl;
+                cerr << "Invalid option!!!" << endl;
+                cerr << "Please try again!!" << endl;
                 system("pause");
                 goto second_display;
             }
@@ -355,7 +329,7 @@ int main(int argc, char const *argv[])
         
         default:
             system("cls");
-            cout << "Error invalid option!!!" << endl;
+            cout << "Error invalid choice!!!" << endl;
             system("pause");
             break;
         }

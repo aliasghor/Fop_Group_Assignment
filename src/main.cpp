@@ -57,7 +57,7 @@ class DatabaseSeats {
             cout << user_seats->m_name << "\t\t" << user_seats->m_row << "\t\t\t" << user_seats->m_payment << " RM" << endl;
         }
 
-        void view_details_bookings() {
+        virtual void view_details_bookings() {
             this->read.open(m_filename);
             string temp_name;
             int temp_seats;
@@ -68,6 +68,15 @@ class DatabaseSeats {
             while (this->read >> temp_name >> temp_seats >> temp_payment)
             {
                 cout << index++ << ". " << "  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment  << " RM" << "\t\t" << "    #" <<endl;
+                if (index == 15) {
+                    cerr << "Error you already reached your limits!!" << endl;
+                    return;
+                }
+            }
+            if (this->read.eof()) {
+                while (index <= 15) {
+                    cout << index++ << ". " << " \t\t\t\t\t\t\t    @" << endl;
+                } 
             }
 
             if (this->read.eof()) {
@@ -76,20 +85,6 @@ class DatabaseSeats {
             
             this->read.close();
         }
-
-        // void check() {
-        //     this->read.open(m_filename);
-        //     string temp_name;
-        //     int temp_seats;
-        //     int index = 1;
-
-        //     cout << "Row " << " Leftover's seats" << endl;
-        //     while (this->read >> temp_name >> temp_seats) {
-        //         cout << ++index << ". " << " @" << endl;
-        //     }
-
-        //     this->read.close();
-        // }
 
         inline bool check_empty_name() {
             this->read.open(m_filename);
@@ -186,6 +181,44 @@ class DatabasePayments : public DatabaseSeats {
             this->read.close();
             return false;
         }
+
+        bool is_empty_file_payments() {
+            this->read.open(m_filename);
+
+            if (!this->read.is_open()) {
+                return true;
+            }
+
+            this->read.close();
+            return false;
+        }
+
+
+        void view_details_bookings() override {
+            this->read.open(m_filename);
+            string temp_name;
+            int temp_seats;
+            int temp_payment;
+            string temp_banks_name;
+            int index = 1;
+
+            cout << "Row " << " Name\t " << "  Seats Row\t " <<  " Has Paid For About\t " << " Banks Name\t " <<" Taken Seats" <<endl;
+            while (this->read >> temp_name >> temp_seats >> temp_payment >> temp_banks_name)
+            {
+                cout << index++ << ". " << "  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment  << " RM" << temp_banks_name << "\t\t" << "    #" <<endl;
+                if (index == 15) {
+                    cerr << "Error you already reached your limits!!" << endl;
+                    return;
+                }
+            }
+            if (this->read.eof()) {
+                while (index <= 15) {
+                    cout << index++ << ". " << " \t\t\t\t\t\t\t    @" << endl;
+                } 
+            }
+            
+            this->read.close();
+        }
 };
 
 
@@ -276,13 +309,6 @@ int main(int argc, char const *argv[])
                     goto try_seats1;
                 }
 
-                else if (seats_row == '\n') {
-                    system("cls");
-                    cerr << "Error you cannot just skipped the questin!!" << endl;
-                    cerr << "Please try again!!" << endl;
-                    goto try_seats1;
-                }
-
                 try_payments1:
                     cout << "Please add your payment(20-10-5) RM: ";
                     cin >> payment;
@@ -291,14 +317,6 @@ int main(int argc, char const *argv[])
                     system("cls");
                     cerr << "Error invalid payment!!" << endl;
                     cerr << "Please try again!!" << endl;
-
-                    goto try_payments1;
-                }
-
-                else if (payment == '\n') {
-                    system("cls");
-                    cerr << "Error you cannot just skipped the question!!" << endl;
-                    cerr << "Please try again" << endl;
 
                     goto try_payments1;
                 }
@@ -326,6 +344,7 @@ int main(int argc, char const *argv[])
             }
 
             else if (choice == 3) {
+                system("cls");
                 if (!data_base_seats->check_empty_view_details_bookings()) {
                     system("cls");
                     cerr << "Error you haven't booked the seats!!" << endl;
@@ -438,18 +457,21 @@ int main(int argc, char const *argv[])
                     goto try_banks_name;
                 }
 
-                user_payments = new UserPayments(name, seats_row, payment, banks_name);
+                else {
+                    user_payments = new UserPayments(name, seats_row, payment, banks_name);
 
-                data_base_payments->write_file_payments(user_payments);
-                system("pause");
+                    data_base_payments->write_file_payments(user_payments);
+                    system("pause");
 
-                delete user_payments;
+                    delete user_payments;
 
-                goto second_display;
+                    goto second_display;
+                }
             }
 
             else if (choice == 5) {
                 system("cls");
+                data_base_payments->is_empty_file_payments();
                 cout << "Here's your payment details" << endl;
                 data_base_payments->view_details_bookings();
                 system("pause");

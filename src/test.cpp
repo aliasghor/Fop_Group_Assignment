@@ -3,8 +3,14 @@
 using namespace std;
 
 int main() {
-    for (int i = 1; i < 15; i++) {
-        cout << "#" << "Gerry" <<" ";
+    int index = 0;
+
+    while (index < 5) {
+        for (int i = 0; i < 10; i++) {
+            cout << "Tikus" << endl;
+        }
+        cout << "Gerry" << endl;
+        index++;
     }
 
     cin.get();

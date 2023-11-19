@@ -69,6 +69,10 @@ class DatabaseSeats {
             {
                 cout << index++ << ". " << "  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment  << " RM" << "\t\t" << "    #" <<endl;
             }
+
+            if (this->read.eof()) {
+                cout << "Gerry" << endl;
+            }
             
             this->read.close();
         }

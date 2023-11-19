@@ -73,36 +73,34 @@ class DatabaseSeats {
                     return;
                 }
             }
+
             if (this->read.eof()) {
                 while (index <= 15) {
                     cout << index++ << ". " << " \t\t\t\t\t\t\t    @" << endl;
                 } 
             }
-
-            if (this->read.eof()) {
-                cout << "Gerry" << endl;
-            }
             
             this->read.close();
         }
 
-        inline bool check_empty_name() {
+        bool check_empty_name() {
             this->read.open(m_filename);
 
             if (!this->read.is_open()) {
-                return false;
+                return true;
             }
 
             this->read.close();
-            return true;
+            return false;
         }
 
         bool check_name(const string& name) {
             this->read.open(m_filename);
             string temp_name;
             int temp_seats;
+            int temp_payments;
 
-            while (this->read >> temp_name >> temp_seats)
+            while (this->read >> temp_name >> temp_seats >> temp_payments)
             {
                 if (temp_name == name) 
                 {
@@ -118,8 +116,9 @@ class DatabaseSeats {
             this->read.open(m_filename);
             string temp_name;
             int temp_seats;
+            int temp_payments;
 
-            while (this->read >> temp_name >> temp_seats)
+            while (this->read >> temp_name >> temp_seats >> temp_payments)
             {
                 if (temp_seats == seats_row)
                 {
@@ -131,15 +130,32 @@ class DatabaseSeats {
             return false;
         }
 
-        inline bool check_empty_view_details_bookings() {
+        bool check_empty_payments(const int& payments) {
             this->read.open(m_filename);
+            string temp_name;
+            int temp_seats;
+            int temp_payments;
 
-            if (!this->read.is_open()) {
-                return false;
+            while (this->read >> temp_name >> temp_seats >> temp_payments) {
+                if (temp_payments == payments) {
+                    this->read.close();
+                    return true;
+                }
             }
 
             this->read.close();
-            return true;
+            return false;
+        }
+
+        bool check_empty_view_details_bookings() {
+            this->read.open(m_filename);
+
+            if (!this->read.is_open()) {
+                return true;
+            }
+
+            this->read.close();
+            return false;
         }
 };
 
@@ -150,7 +166,7 @@ class DatabasePayments : public DatabaseSeats {
         void write_file_payments(UserPayments* user_payment) {
             this->write.open(m_filename);
 
-            this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_banks_name << endl;
+            this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_payment << " "  << user_payment->m_banks_name << endl;
 
             this->write.close();
 
@@ -162,24 +178,8 @@ class DatabasePayments : public DatabaseSeats {
             cout << "Here's your name, seats row and your banks name" << endl;
             cout << '\n';
 
-            cout << "Name\t " << "   Seats Row\t " << "   Banks Name" << endl;
-            cout << user_payment_data->m_name << "\t\t" << user_payment_data->m_row << "\t\t" << user_payment_data->m_banks_name << endl;
-        }
-
-        bool check_previous_name(const string& name) {
-            this->read.open(m_filename);
-            string temp_name;
-            int temp_age;
-
-            while (this->read >> temp_name >> temp_age)
-            {
-                if (temp_name == name) {
-                    return true;
-                }
-            }
-
-            this->read.close();
-            return false;
+            cout << "Name\t " << "   Seats Row\t " << " Has Paid For About\t " << "   Banks Name" << endl;
+            cout << user_payment_data->m_name << "\t\t" << user_payment_data->m_row << "\t\t" << user_payment_data->m_payment << " RM" << "\t\t\t" << user_payment_data->m_banks_name << endl;
         }
 
         bool is_empty_file_payments() {
@@ -202,19 +202,14 @@ class DatabasePayments : public DatabaseSeats {
             string temp_banks_name;
             int index = 1;
 
-            cout << "Row " << " Name\t " << "  Seats Row\t " <<  " Has Paid For About\t " << " Banks Name\t " <<" Taken Seats" <<endl;
+            cout << "Row " << " Name\t " << "  Seats Row\t " <<  " Has Paid For About\t " << " Banks Name" << endl;
             while (this->read >> temp_name >> temp_seats >> temp_payment >> temp_banks_name)
             {
-                cout << index++ << ". " << "  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment  << " RM" << temp_banks_name << "\t\t" << "    #" <<endl;
+                cout << index++ << ". " << "  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment  << " RM" << "\t\t     " << temp_banks_name << endl;
                 if (index == 15) {
                     cerr << "Error you already reached your limits!!" << endl;
                     return;
                 }
-            }
-            if (this->read.eof()) {
-                while (index <= 15) {
-                    cout << index++ << ". " << " \t\t\t\t\t\t\t    @" << endl;
-                } 
             }
             
             this->read.close();
@@ -344,8 +339,7 @@ int main(int argc, char const *argv[])
             }
 
             else if (choice == 3) {
-                system("cls");
-                if (!data_base_seats->check_empty_view_details_bookings()) {
+                if (data_base_seats->check_empty_view_details_bookings()) {
                     system("cls");
                     cerr << "Error you haven't booked the seats!!" << endl;
                     cerr << "You must book your seats first if you want to choose this option!!" << endl;
@@ -385,7 +379,7 @@ int main(int argc, char const *argv[])
                     goto try_name2;
                 }
 
-                else if (!data_base_seats->check_empty_name()) {
+                else if (data_base_seats->check_empty_name()) {
                     system("cls");
                     cerr << "Error you haven't registered your names yet!!" << endl;
                     cerr << "You must register your names first!!" << endl;
@@ -422,20 +416,21 @@ int main(int argc, char const *argv[])
                 try_payments2:
                     cout << "Please enter your previous payment: ";
                     cin >> payment;
+                    cin.ignore();
 
-                if (payment == '\n') {
+                if (payment != 20 && payment != 10 && payment != 5) {
                     system("cls");
-                    cerr << "Error you cannot just skipped the question!!" << endl;
+                    cerr << "Error please enter your valid payment!!" << endl;
                     cerr << "Please try again!!" << endl;
 
                     goto try_payments2;
                 }
 
-                else if (payment != 20 && payment != 10 && payment != 5) {
+                else if (!data_base_seats->check_empty_payments(payment)) {
                     system("cls");
-                    cerr << "Error please enter your valid payment!!" << endl;
-                    cerr << "Please try again!!" << endl;
-
+                    cerr << "Error invalid payments!!" << endl;
+                    cerr << "Please input your previous payments!!" << endl;
+                    
                     goto try_payments2;
                 }
 
@@ -470,12 +465,20 @@ int main(int argc, char const *argv[])
             }
 
             else if (choice == 5) {
-                system("cls");
-                data_base_payments->is_empty_file_payments();
-                cout << "Here's your payment details" << endl;
-                data_base_payments->view_details_bookings();
-                system("pause");
-                goto second_display;
+                if (data_base_payments->is_empty_file_payments()) {
+                    system("cls");
+                    cerr << "Error you haven't registered your banks account name!!" << endl;
+                    cerr << "Please try again!!" << endl;
+                    system("pause");
+                    goto second_display;
+                }
+                else {
+                    system("cls");
+                    cout << "Here's your payment details" << endl;
+                    data_base_payments->view_details_bookings();
+                    system("pause");
+                    goto second_display;
+                }
             }
 
             else if (choice == 6) {
@@ -505,7 +508,7 @@ int main(int argc, char const *argv[])
                 cin >> choice;
 
             if (choice == 2) {
-                if (!data_base_seats->check_empty_view_details_bookings()) {
+                if (data_base_seats->check_empty_view_details_bookings()) {
                     system("cls");
                     cerr << "Error you haven't created the name and your seats row!!" << endl;
                     cerr << "Please fill your name and your seats row first!!" << endl;
@@ -516,7 +519,9 @@ int main(int argc, char const *argv[])
                 else {
                     system("cls");
                     data_base_seats->view_details_bookings();
-                    system("pause");  
+                    system("pause");
+
+                    goto third_display;  
                 }
             }
 

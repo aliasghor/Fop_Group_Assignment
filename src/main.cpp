@@ -8,9 +8,10 @@ class UserSeats {
     protected:
         string m_name;
         int m_row;
+        int m_payment;
 
     public:
-        UserSeats(const string& name, const int& row) : m_name(name), m_row(row) {}
+        UserSeats(const string& name, const int& row, const int& payment) : m_name(name), m_row(row), m_payment(payment) {}
 
         friend class DatabaseSeats;
 };
@@ -20,7 +21,7 @@ class UserPayments : public UserSeats {
         string m_banks_name;
 
     public:
-        UserPayments(const string& name, const int& row, const string& banks_name) : UserSeats(name, row), m_banks_name(banks_name) {}
+        UserPayments(const string& name, const int& row, const int& payment ,const string& banks_name) : UserSeats(name, row, payment), m_banks_name(banks_name) {}
 
         friend class DatabasePayments;
 };
@@ -39,7 +40,7 @@ class DatabaseSeats {
             if (!check_name(user_seats_data->m_name) && !check_seats_row(user_seats_data->m_row)) {
                 this->write.open(m_filename,ios::app);
 
-                this->write << user_seats_data->m_name << " " << user_seats_data->m_row << endl;
+                this->write << user_seats_data->m_name << " " << user_seats_data->m_row << " " << user_seats_data->m_payment << endl;
 
                 this->write.close();
 
@@ -52,8 +53,8 @@ class DatabaseSeats {
             cout << "Here's your name and your seats row" << endl;
             cout << '\n';
 
-            cout << "Name\t " << "     Seats Row" << endl;
-            cout << user_seats->m_name << "\t\t" << user_seats->m_row << endl;
+            cout << "Name\t " << "     Seats Row" << "\t" << " Has Paid For About" << endl;
+            cout << user_seats->m_name << "\t\t" << user_seats->m_row << "\t" << user_seats->m_payment << endl;
         }
 
         void view_details_bookings() {
@@ -178,10 +179,11 @@ int main(int argc, char const *argv[])
     UserSeats* user_seats;
 
     string name, banks_name;
-    int choice, seats_row;
+    int choice, seats_row, payment;
     
     while (true)
     {
+        system("cls");
         first_display:
             system("cls");
             cout << "Please select a user" << endl;
@@ -255,8 +257,35 @@ int main(int argc, char const *argv[])
                     goto try_seats1;
                 }
 
+                else if (seats_row == '\n') {
+                    system("cls");
+                    cerr << "Error you cannot just skipped the questin!!" << endl;
+                    cerr << "Please try again!!" << endl;
+                    goto try_seats1;
+                }
+
+                try_payments1:
+                    cout << "Please add your payment(20-10-5) RM: ";
+                    cin >> payment;
+
+                if (payment != 20 && payment != 10 && payment != 5) {
+                    system("cls");
+                    cerr << "Error invalid payment!!" << endl;
+                    cerr << "Please try again!!" << endl;
+
+                    goto try_payments1;
+                }
+
+                else if (payment == '\n') {
+                    system("cls");
+                    cerr << "Error you cannot just skipped the question!!" << endl;
+                    cerr << "Please try again" << endl;
+
+                    goto try_payments1;
+                }
+
                 else {
-                    user_seats = new UserSeats(name, seats_row);
+                    user_seats = new UserSeats(name, seats_row, payment);
 
                     data_base_seats->write_file_seats(user_seats);
                     system("pause");
@@ -265,6 +294,16 @@ int main(int argc, char const *argv[])
 
                     goto second_display;
                 }
+            }
+
+            else if (choice == 2) {
+                system("cls");
+                cout << "Here's all of the price list" << endl;
+                cout << "1.20RM" << endl;
+                cout << "2.10RM" << endl;
+                cout << "3.5RM" << endl;
+                system("pause");
+                goto second_display;
             }
 
             else if (choice == 3) {
@@ -341,6 +380,26 @@ int main(int argc, char const *argv[])
                     goto try_seats2;
                 }
 
+                try_payments2:
+                    cout << "Please enter your previous payment: ";
+                    cin >> payment;
+
+                if (payment == '\n') {
+                    system("cls");
+                    cerr << "Error you cannot just skipped the question!!" << endl;
+                    cerr << "Please try again!!" << endl;
+
+                    goto try_payments2;
+                }
+
+                else if (payment != 20 && payment != 10 && payment != 5) {
+                    system("cls");
+                    cerr << "Error please enter your valid payment!!" << endl;
+                    cerr << "Please try again!!" << endl;
+
+                    goto try_payments2;
+                }
+
                 try_banks_name:
                     cout << "Please enter your bank's name: "; 
                     getline(cin,banks_name);
@@ -359,7 +418,7 @@ int main(int argc, char const *argv[])
                     goto try_banks_name;
                 }
 
-                user_payments = new UserPayments(name, seats_row, banks_name);
+                user_payments = new UserPayments(name, seats_row, payment, banks_name);
 
                 data_base_payments->write_file_payments(user_payments);
                 system("pause");

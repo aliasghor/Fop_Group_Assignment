@@ -1,2 +1,3 @@
-ali 1 5
-gerry 2 10
+ali 1 20
+gerry 2 5
+mogi 10 20

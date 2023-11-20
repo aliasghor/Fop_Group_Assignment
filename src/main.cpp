@@ -64,10 +64,10 @@ class DatabaseSeats {
             int temp_payment;
             int index = 1;
 
-            cout << "Row " << " Name\t " << "  Seats Row\t " <<  " Has Paid For About\t " << " Taken Seats" <<endl;
+            cout << "Row " << " Name\t " << "  Seats Row\t " <<  " Has Paid For About\t\t" << " Seats That Is Already Taken" << endl;
             while (this->read >> temp_name >> temp_seats >> temp_payment)
             {
-                cout << index++ << ". " << "  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment  << " RM" << "\t\t" << "    #" <<endl;
+                cout << index++ << ". " << "  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment  << " RM" << "\t\t\t" << " # (This Seat Is Already Taken)" << endl;
                 if (index == 15) {
                     cerr << "Error you already reached your limits!!" << endl;
                     return;
@@ -76,10 +76,25 @@ class DatabaseSeats {
 
             if (this->read.eof()) {
                 while (index <= 15) {
-                    cout << index++ << ". " << " \t\t\t\t\t\t\t    @" << endl;
-                } 
+                    cout << index++ << "\t\t\t\t\t\t\t\t" << " @ (This Seat Is Not Taken Yet)" << endl;
+                }
             }
             
+            this->read.close();
+        }
+
+        void show_names_and_seats_and_amount_of_paid() {
+            this->read.open(m_filename);
+            string temp_name;
+            int temp_seats;
+            int temp_payment;
+            int index = 1;
+
+            cout << "Row\t" << " Name\t " << " Seats Row\t" << " Has Paid For About" << endl;
+            while (this->read >> temp_name >> temp_seats >> temp_payment) {
+                cout << index++ << ". " << "\t  " << temp_name << "\t\t" << temp_seats << "\t\t" << temp_payment << " RM" << endl;
+            }
+
             this->read.close();
         }
 
@@ -157,6 +172,33 @@ class DatabaseSeats {
             this->read.close();
             return false;
         }
+
+        bool check_empty_overall_payments_collected() {
+            this->read.open(m_filename);
+
+            if (!this->read.is_open()) {
+                return true;
+            }
+
+            this->read.close();
+            return false;
+        }
+
+        int view_overall_payments_collected() {
+            this->read.open(m_filename);
+            string temp_name;
+            int temp_seats;
+            int temp_payments;
+            int temp_balance = 0;
+            string temp_banks_name;
+
+            while (this->read >> temp_name >> temp_seats >> temp_payments) {
+                temp_balance += temp_payments;
+            }
+
+            this->read.close();
+            return temp_balance;
+        }
 };
 
 class DatabasePayments : public DatabaseSeats {
@@ -164,7 +206,7 @@ class DatabasePayments : public DatabaseSeats {
         DatabasePayments(const string& filename) : DatabaseSeats(filename) {}
 
         void write_file_payments(UserPayments* user_payment) {
-            this->write.open(m_filename);
+            this->write.open(m_filename,ios::app);
 
             this->write << user_payment->m_name << " " << user_payment->m_row << " " << user_payment->m_payment << " "  << user_payment->m_banks_name << endl;
 
@@ -192,7 +234,6 @@ class DatabasePayments : public DatabaseSeats {
             this->read.close();
             return false;
         }
-
 
         void view_details_bookings() override {
             this->read.open(m_filename);
@@ -350,7 +391,7 @@ int main(int argc, char const *argv[])
                 else {
                     system("cls");
                     cout << "Here's the users that already booked" << endl;
-                    data_base_seats->view_details_bookings();
+                    data_base_seats->show_names_and_seats_and_amount_of_paid();
                     system("pause");
                     goto second_display;
                 }
@@ -506,6 +547,20 @@ int main(int argc, char const *argv[])
 
                 cout << "Choose your options here: ";
                 cin >> choice;
+
+            if (choice == 1) {
+                system("cls");
+                if (data_base_seats->check_empty_overall_payments_collected()) {
+                    cerr << "Error you haven't created your names and your seats row nor bank's account name!!" << endl;
+                    cerr << "Please fill those criterias first!!" << endl;
+                    system("pause");
+                    goto second_display;
+                }
+                cout << "Here's all of our current balance" << endl;
+                cout << data_base_seats->view_overall_payments_collected() << " RM" << endl;
+                system("pause");
+                goto third_display;
+            }
 
             if (choice == 2) {
                 if (data_base_seats->check_empty_view_details_bookings()) {
